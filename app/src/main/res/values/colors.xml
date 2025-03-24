@@ -3,7 +3,18 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue_for_login_text">#143A97</color>
+    <color name="unactive">#415AA0</color>
     <color name="shadow">#40000000</color>
     <color name="gray">#5D2E2D2D</color>
     <color name="profile_border">#1289DC</color>
+
+    <color name="tab_primary">#143A97</color>
+    <color name="tab_primary_light">#3A5BB5</color>
+    <!-- Текст и индикатор -->
+    <color name="tab_text_selected">#FFFFFF</color> <!-- Чистый белый -->
+    <color name="tab_text_unselected">#B3FFFFFF</color> <!-- Белый 70% -->
+    <color name="tab_indicator">#4FC3F7</color> <!-- Светло-голубой (акцент) -->
+    <!-- Состояния -->
+    <color name="tab_ripple">#33FFFFFF</color> <!-- Субтильный эффект -->
+    <color name="tab_primary_dark">#0E2B7A</color> <!-- Для pressed -->
 </resources>
