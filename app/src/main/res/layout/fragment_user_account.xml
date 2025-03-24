@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".presentation.ui.fragment.UserAccount">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/profile_image"
+        android:layout_width="135dp"
+        android:layout_height="135dp"
+        android:padding="4dp"
+    android:scaleType="centerCrop"
+    android:src="@drawable/icon_user_2"
+    app:strokeColor="@color/profile_border"
+    app:strokeWidth="2dp"
+    app:shapeAppearanceOverlay="@style/CircleShape"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="50dp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:text="Aleksey Strunets"
+        android:layout_marginTop="10dp"
+        android:id="@+id/user_login"
+        app:layout_constraintTop_toBottomOf="@id/profile_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_marginTop="10dp"
+        android:text="a.strunetss@gmail.com"
+        android:id="@+id/user_email"
+        app:layout_constraintTop_toBottomOf="@id/user_login"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/switch_mode_button"
+        style="@style/RoundedButton"
+        android:layout_marginTop="10dp"
+        android:text="Change mode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/user_email"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="200dp"
+        android:layout_height="50dp"/>
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/first_text_for_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:paddingHorizontal="15dp"
+        android:text="@string/app_description"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/switch_mode_button" />
+
+    <LinearLayout
+        android:id="@+id/bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/blue_for_login_text"
+        android:elevation="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btn_home"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_home"
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            android:contentDescription="@string/home"/>
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btn_bookmarks"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_saving_news"
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            android:contentDescription="@string/bookmarks"/>
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btn_profile"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_user_for_buttom"
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            android:contentDescription="@string/profile"/>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
