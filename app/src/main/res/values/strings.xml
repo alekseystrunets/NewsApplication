@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">NewsApplication</string>
+    <string name="Greetings_for_login1">Welcome to NewsApp!</string>
+    <string name="Greetings_for_login2">There are lots of interesting news waiting for you here</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

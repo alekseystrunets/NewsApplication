@@ -7,6 +7,10 @@ android {
     namespace = "com.example.newsapplication"
     compileSdk = 35
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         applicationId = "com.example.newsapplication"
         minSdk = 34
