@@ -1,5 +1,3 @@
-package com.example.newsapplication.presentation.viewmodel
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,8 +14,8 @@ class LoginFragmentViewModel : ViewModel() {
     private val _passwordError = MutableLiveData<String?>()
     val passwordError: LiveData<String?> get() = _passwordError
 
-    private val _userNotFoundError = MutableLiveData<String?>()
-    val userNotFoundError: LiveData<String?> get() = _userNotFoundError
+    private val _authError = MutableLiveData<String?>()
+    val authError: LiveData<String?> get() = _authError
 
     private val _isValid = MutableLiveData<Boolean>()
     val isValid: LiveData<Boolean> get() = _isValid
@@ -25,60 +23,68 @@ class LoginFragmentViewModel : ViewModel() {
     private val LOGIN_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]{3,20}$")
     private val PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$")
 
-    // Добавляем переменную для UserDao
-    var userDao: UserDao? = null
+    lateinit var userDao: UserDao
 
     fun validateInput(login: String, password: String) {
         _loginError.value = null
         _passwordError.value = null
-        _userNotFoundError.value = null
+        _authError.value = null
 
         var hasErrors = false
 
         when {
             login.isEmpty() -> {
-                _loginError.value = "Please enter your username"
+                _loginError.value = "Please enter username"
                 hasErrors = true
             }
             !LOGIN_PATTERN.matcher(login).matches() -> {
-                _loginError.value = "3-20 characters (letters, numbers, ._-)"
+                _loginError.value = "3-20 chars (letters, numbers, ._-)"
                 hasErrors = true
             }
         }
 
         when {
             password.isEmpty() -> {
-                _passwordError.value = "Please enter your password"
+                _passwordError.value = "Please enter password"
                 hasErrors = true
             }
             !PASSWORD_PATTERN.matcher(password).matches() -> {
                 _passwordError.value = """
-                    Password requirements:
-                    - 8+ characters
-                    - 1 uppercase letter
-                    - 1 lowercase letter
-                    - 1 number
-                    - No spaces
+                    Password must contain:
+                    • 8+ characters
+                    • 1 uppercase letter
+                    • 1 lowercase letter
+                    • 1 number
+                    • No spaces
                 """.trimIndent()
                 hasErrors = true
             }
         }
 
         if (!hasErrors) {
-            checkUserExists(login, password)
+            authenticateUser(login, password)
         } else {
             _isValid.value = false
         }
     }
 
-    private fun checkUserExists(login: String, password: String) {
+    private fun authenticateUser(login: String, password: String) {
         viewModelScope.launch {
-            val user = userDao?.getUserByEmailAndPassword(login, password)
-            if (user != null) {
-                _isValid.value = true
-            } else {
-                _userNotFoundError.value = "User not found or incorrect credentials"
-                _isValid.value = false
+            try {
+                val user = userDao.getUserByLoginAndPassword(login, password)
+                if (user != null) {
+                    _isValid.postValue(true)
+                } else {
+                    val userExists = userDao.getUserByLogin(login) != null
+                    _authError.postValue(
+                        if (userExists) "Incorrect password"
+                        else "User not found"
+                    )
+                    _isValid.postValue(false)
+                }
+            } catch (e: Exception) {
+                _authError.postValue("Authentication failed")
+                _isValid.postValue(false)
             }
         }
     }

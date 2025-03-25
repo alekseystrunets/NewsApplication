@@ -1,9 +1,9 @@
 package com.example.newsapplication.presentation.ui.activity
 
+import LoginFragment
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.newsapplication.R
-import com.example.newsapplication.presentation.ui.fragment.LoginFragment
 
 
 class MainActivity : AppCompatActivity() {

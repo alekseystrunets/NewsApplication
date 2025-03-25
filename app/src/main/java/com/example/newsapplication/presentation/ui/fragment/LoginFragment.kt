@@ -1,6 +1,3 @@
-package com.example.newsapplication.presentation.ui.fragment
-
-import RegistrationFragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.newsapplication.R
 import com.example.newsapplication.data.db.repository.AppDatabase
 import com.example.newsapplication.databinding.FragmentLoginBinding
-import com.example.newsapplication.presentation.viewmodel.LoginFragmentViewModel
+import com.example.newsapplication.presentation.ui.fragment.NewsFragment
 
 class LoginFragment : Fragment() {
 
@@ -29,15 +26,12 @@ class LoginFragment : Fragment() {
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
-
         viewModel.userDao = AppDatabase.getDatabase(requireContext()).userDao()
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initAnimations()
         setupClickListeners()
         setupObservers()
@@ -120,15 +114,15 @@ class LoginFragment : Fragment() {
             error?.let { binding.passwordEditText.requestFocus() }
         }
 
-        viewModel.userNotFoundError.observe(viewLifecycleOwner) { error ->
+        viewModel.authError.observe(viewLifecycleOwner) { error ->
             error?.let {
-                Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
         }
 
         viewModel.isValid.observe(viewLifecycleOwner) { isValid ->
             if (isValid == true) {
-                Toast.makeText(requireContext(), "Вход выполнен!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                 navigateToNews()
             }
         }
