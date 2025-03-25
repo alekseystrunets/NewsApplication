@@ -1,5 +1,6 @@
 package com.example.newsapplication.presentation.ui.fragment
 
+import RegistrationFragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -97,11 +98,9 @@ class LoginFragment : Fragment() {
             val login = binding.loginEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
 
-            // Сбрасываем ошибки
             binding.loginInputLayout.error = null
             binding.passwordInputLayout.error = null
 
-            // Валидируем ввод
             viewModel.validateInput(login, password)
         }
 
