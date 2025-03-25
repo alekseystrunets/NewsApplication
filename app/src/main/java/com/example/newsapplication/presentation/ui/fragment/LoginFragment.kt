@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.newsapplication.R
+import com.example.newsapplication.data.db.repository.AppDatabase
 import com.example.newsapplication.databinding.FragmentLoginBinding
 import com.example.newsapplication.presentation.viewmodel.LoginFragmentViewModel
 
@@ -27,6 +28,9 @@ class LoginFragment : Fragment() {
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
+
+        viewModel.userDao = AppDatabase.getDatabase(requireContext()).userDao()
+
         return binding.root
     }
 
@@ -93,9 +97,11 @@ class LoginFragment : Fragment() {
             val login = binding.loginEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
 
+            // Сбрасываем ошибки
             binding.loginInputLayout.error = null
             binding.passwordInputLayout.error = null
 
+            // Валидируем ввод
             viewModel.validateInput(login, password)
         }
 
@@ -113,6 +119,12 @@ class LoginFragment : Fragment() {
         viewModel.passwordError.observe(viewLifecycleOwner) { error ->
             binding.passwordInputLayout.error = error
             error?.let { binding.passwordEditText.requestFocus() }
+        }
+
+        viewModel.userNotFoundError.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+            }
         }
 
         viewModel.isValid.observe(viewLifecycleOwner) { isValid ->
