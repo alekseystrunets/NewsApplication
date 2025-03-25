@@ -83,9 +83,15 @@ class LoginFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.registerButton.setOnClickListener {
-            val registrationFragment = RegistrationFragment()
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, registrationFragment)
+                .replace(R.id.fragment_container, RegistrationFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        binding.loginButton.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, NewsFragment())
                 .addToBackStack(null)
                 .commit()
         }
