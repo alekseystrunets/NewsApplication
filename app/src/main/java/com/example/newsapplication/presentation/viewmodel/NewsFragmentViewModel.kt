@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapplication.data.api.RetrofitClient
 import com.example.newsapplication.presentation.NewsItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -26,45 +28,70 @@ class NewsFragmentViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val response = when (category) {
-                    "Apple" -> RetrofitClient.api.getAppleNews()
-                    "Tesla" -> RetrofitClient.api.getTeslaNews()
-                    "US business" -> RetrofitClient.api.getUSBusinessHeadlines()
-                    "TechCrunch" -> RetrofitClient.api.getTechCrunchHeadlines()
-                    "Wall Street Journal" -> RetrofitClient.api.getWSJArticles()
-                    else -> throw IllegalArgumentException("Unknown category")
+                // Загрузка данных в IO-потоке
+                val newsItems = withContext(Dispatchers.IO) {
+                    loadNewsFromApi(category)
                 }
 
-                if (response.articles.isEmpty()) {
-                    _error.postValue("No articles found for $category")
-                } else {
-                    _newsList.postValue(response.articles.map { article ->
-                        NewsItem(
-                            title = article.title,
-                            author = article.author ?: "Unknown",
-                            date = formatDate(article.publishedAt),
-                            imageUrl = article.urlToImage,
-                            content = article.content ?: "",
-                            source = article.source.name,
-                            articleUrl = article.url
-                        )
-                    })
-                }
-            } catch (e: HttpException) {
-                val errorMsg = when (e.code()) {
-                    403 -> "API key invalid or quota exceeded"
-                    429 -> "Too many requests"
-                    else -> "API error: ${e.code()}"
-                }
-                _error.postValue("$category: $errorMsg")
-                Log.e("NewsAPI", "HTTP Error loading $category: $errorMsg")
+                _newsList.postValue(newsItems)
             } catch (e: Exception) {
-                _error.postValue("$category: ${e.message}")
-                Log.e("NewsAPI", "Error loading $category", e)
+                handleError(e, category)
             } finally {
                 _isLoading.postValue(false)
             }
         }
+    }
+
+    private suspend fun loadNewsFromApi(category: String): List<NewsItem> {
+        return try {
+            val response = when (category) {
+                "Apple" -> RetrofitClient.api.getAppleNews()
+                "Tesla" -> RetrofitClient.api.getTeslaNews()
+                "US business" -> RetrofitClient.api.getUSBusinessHeadlines()
+                "TechCrunch" -> RetrofitClient.api.getTechCrunchHeadlines()
+                "Wall Street Journal" -> RetrofitClient.api.getWSJArticles()
+                else -> throw IllegalArgumentException("Unknown category")
+            }
+
+            if (response.articles.isEmpty()) {
+                throw Exception("No articles found for $category")
+            }
+
+            response.articles.map { article ->
+                NewsItem(
+                    title = article.title,
+                    author = article.author ?: "Unknown",
+                    date = formatDate(article.publishedAt),
+                    imageUrl = article.urlToImage,
+                    content = article.content ?: "",
+                    source = article.source.name,
+                    articleUrl = article.url
+                )
+            }
+        } catch (e: HttpException) {
+            throw when (e.code()) {
+                403 -> Exception("API key invalid or quota exceeded")
+                429 -> Exception("Too many requests")
+                else -> Exception("API error: ${e.code()}")
+            }
+        }
+    }
+
+    private fun handleError(e: Exception, category: String) {
+        val errorMsg = when (e) {
+            is HttpException -> {
+                when (e.code()) {
+                    403 -> "API key invalid or quota exceeded"
+                    429 -> "Too many requests"
+                    else -> "API error: ${e.code()}"
+                }
+            }
+            else -> e.message ?: "Unknown error"
+        }
+
+        _error.postValue("$category: $errorMsg")
+        Log.e("NewsAPI", "Error loading $category", e)
+        _newsList.postValue(emptyList())
     }
 
     private fun formatDate(dateString: String?): String {

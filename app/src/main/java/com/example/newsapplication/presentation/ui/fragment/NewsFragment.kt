@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newsapplication.R
 import com.example.newsapplication.databinding.FragmentNewsBinding
 import com.example.newsapplication.presentation.adapter.NewsAdapter
 import com.google.android.material.tabs.TabLayout
@@ -31,6 +32,13 @@ class NewsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProvider(this).get(NewsFragmentViewModel::class.java)
+
+        binding.btnBookmarks.setOnClickListener {
+            toBookMarksScreen()
+        }
+        binding.btnProfile.setOnClickListener{
+            toAccountScreen()
+        }
 
         setupRecyclerView()
         setupTabLayout()
@@ -70,6 +78,7 @@ class NewsFragment : Fragment() {
                     viewModel.loadNews(category)
                 }
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
@@ -85,6 +94,19 @@ class NewsFragment : Fragment() {
             binding.recyclerView.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
         }
     }
+
+    private fun toBookMarksScreen() {
+        val bookMarksFragment = BooksMarkFragment()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, bookMarksFragment)
+            .addToBackStack(null).commit()
+    }
+
+    private fun toAccountScreen() {
+        val userAccount = UserAccount()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, userAccount)
+            .addToBackStack(null).commit()
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
