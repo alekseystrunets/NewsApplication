@@ -33,24 +33,31 @@ class NewsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProvider(this).get(NewsFragmentViewModel::class.java)
-
-        binding.btnBookmarks.setOnClickListener {
-            toBookMarksScreen()
-        }
-        binding.btnProfile.setOnClickListener{
-            toAccountScreen()
-        }
-
         setupRecyclerView()
         setupTabLayout()
         observeViewModel()
 
-        // Загружаем данные для первой вкладки
+        binding.btnBookmarks.setOnClickListener { toBookMarksScreen() }
+        binding.btnProfile.setOnClickListener { toAccountScreen() }
+
         viewModel.loadNews("Apple")
     }
 
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter().apply {
+            onItemClick = { newsItem ->
+                val fragment = NewsPageFragment().apply {
+                    arguments = Bundle().apply {
+                        putParcelable("news_item", newsItem)
+                    }
+                }
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = newsAdapter
@@ -59,27 +66,14 @@ class NewsFragment : Fragment() {
     }
 
     private fun setupTabLayout() {
-        val categories = listOf(
-            "Apple",
-            "Tesla",
-            "US business",
-            "TechCrunch",
-            "Wall Street Journal"
-        )
-
-        categories.forEach { category ->
-            binding.newsTabLayout.addTab(
-                binding.newsTabLayout.newTab().setText(category)
-            )
+        listOf("Apple", "Tesla", "US business", "TechCrunch", "Wall Street Journal").forEach {
+            binding.newsTabLayout.addTab(binding.newsTabLayout.newTab().setText(it))
         }
 
         binding.newsTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab?.text?.toString()?.let { category ->
-                    viewModel.loadNews(category)
-                }
+                tab?.text?.let { viewModel.loadNews(it.toString()) }
             }
-
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
@@ -92,22 +86,22 @@ class NewsFragment : Fragment() {
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-            binding.recyclerView.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
         }
     }
 
     private fun toBookMarksScreen() {
-        val bookMarksFragment = BooksMarkFragment()
-        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, bookMarksFragment)
-            .addToBackStack(null).commit()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, BooksMarkFragment())
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun toAccountScreen() {
-        val userAccount = UserAccount()
-        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, userAccount)
-            .addToBackStack(null).commit()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, UserAccount())
+            .addToBackStack(null)
+            .commit()
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

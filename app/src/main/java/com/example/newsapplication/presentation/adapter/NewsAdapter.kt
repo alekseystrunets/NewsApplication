@@ -6,10 +6,32 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.newsapplication.R
 import com.example.newsapplication.databinding.NewsRecyclerViewItemBinding
-import com.example.newsapplication.presentation.NewsItem
+import com.example.newsapplication.presentation.model.NewsItem
 
-class NewsAdapter : ListAdapter<NewsItem, NewsAdapter.NewsViewHolder>(NewsDiffCallback()) {
+class NewsAdapter : ListAdapter<NewsItem, NewsAdapter.NewsViewHolder>(DiffCallback()) {
+
+    var onItemClick: ((NewsItem) -> Unit)? = null
+
+    inner class NewsViewHolder(private val binding: NewsRecyclerViewItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: NewsItem) {
+            binding.apply {
+                title.text = item.title
+                author.text = item.author
+                date.text = item.date
+
+                Glide.with(root.context)
+                    .load(item.imageUrl)
+                    .placeholder(R.drawable.baseline_block_24)
+                    .into(imageViewRecyclerItem)
+
+                root.setOnClickListener { onItemClick?.invoke(item) }
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val binding = NewsRecyclerViewItemBinding.inflate(
@@ -24,36 +46,11 @@ class NewsAdapter : ListAdapter<NewsItem, NewsAdapter.NewsViewHolder>(NewsDiffCa
         holder.bind(getItem(position))
     }
 
-    inner class NewsViewHolder(private val binding: NewsRecyclerViewItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class DiffCallback : DiffUtil.ItemCallback<NewsItem>() {
+        override fun areItemsTheSame(oldItem: NewsItem, newItem: NewsItem) =
+            oldItem.title == newItem.title
 
-        fun bind(item: NewsItem) {
-            binding.title.text = item.title
-            binding.author.text = item.author
-            binding.date.text = item.date
-
-            item.imageUrl?.let { url ->
-                Glide.with(binding.root)
-                    .load(url)
-                    .centerCrop()
-                    .into(binding.imageViewRecyclerItem)
-            } ?: run {
-                binding.imageViewRecyclerItem.setImageResource(android.R.color.darker_gray)
-            }
-
-            binding.root.setOnClickListener {
-
-            }
-        }
-    }
-
-    private class NewsDiffCallback : DiffUtil.ItemCallback<NewsItem>() {
-        override fun areItemsTheSame(oldItem: NewsItem, newItem: NewsItem): Boolean {
-            return oldItem.articleUrl == newItem.articleUrl
-        }
-
-        override fun areContentsTheSame(oldItem: NewsItem, newItem: NewsItem): Boolean {
-            return oldItem == newItem
-        }
+        override fun areContentsTheSame(oldItem: NewsItem, newItem: NewsItem) =
+            oldItem == newItem
     }
 }

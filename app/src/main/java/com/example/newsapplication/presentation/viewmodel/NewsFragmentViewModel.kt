@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapplication.data.api.RetrofitClient
-import com.example.newsapplication.presentation.NewsItem
+import com.example.newsapplication.presentation.model.NewsItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,7 +28,6 @@ class NewsFragmentViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // Загрузка данных в IO-потоке
                 val newsItems = withContext(Dispatchers.IO) {
                     loadNewsFromApi(category)
                 }
@@ -64,6 +63,7 @@ class NewsFragmentViewModel : ViewModel() {
                     date = formatDate(article.publishedAt),
                     imageUrl = article.urlToImage,
                     content = article.content ?: "",
+                    description = article.description ?: "",
                     source = article.source.name,
                     articleUrl = article.url
                 )
