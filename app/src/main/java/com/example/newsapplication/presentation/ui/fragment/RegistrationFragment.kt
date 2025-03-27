@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.newsapplication.R
 import com.example.newsapplication.data.db.repository.AppDatabase
+import com.example.newsapplication.data.db.sharedpref.SharedPreferencesManager
 import com.example.newsapplication.databinding.FragmentRegistrationBinding
 import com.example.newsapplication.presentation.ui.fragment.NewsFragment
 
@@ -31,7 +32,6 @@ class RegistrationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initAnimations()
         setupClickListeners()
         setupObservers()
@@ -39,18 +39,11 @@ class RegistrationFragment : Fragment() {
 
     private fun initAnimations() {
         binding.apply {
-            firstGreetingForLogin.alpha = 0f
-            divider.alpha = 0f
-            secondGreetingForLogin.alpha = 0f
-            formCard.alpha = 0f
-            formCard.translationY = 40f
-
             firstGreetingForLogin.animate()
                 .alpha(1f)
                 .setDuration(600)
                 .setInterpolator(DecelerateInterpolator())
                 .withEndAction {
-                    divider.scaleX = 0f
                     divider.animate()
                         .alpha(1f)
                         .scaleX(1f)
@@ -65,7 +58,6 @@ class RegistrationFragment : Fragment() {
                                         .alpha(1f)
                                         .translationY(0f)
                                         .setDuration(600)
-                                        .setInterpolator(DecelerateInterpolator())
                                         .start()
                                 }
                                 .start()
@@ -86,7 +78,7 @@ class RegistrationFragment : Fragment() {
             binding.emailInputLayout.error = null
             binding.passwordInputLayout.error = null
 
-            viewModel.registerUser(login, email, password)
+            viewModel.registerUser(login, email, password, requireContext())
         }
     }
 
@@ -105,14 +97,14 @@ class RegistrationFragment : Fragment() {
 
         viewModel.registrationSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
-                showSuccessMessage()
+                Toast.makeText(
+                    requireContext(),
+                    "Registration successful!",
+                    Toast.LENGTH_SHORT
+                ).show()
                 navigateToNews()
             }
         }
-    }
-
-    private fun showSuccessMessage() {
-        Toast.makeText(requireContext(), "Registration successful!", Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToNews() {

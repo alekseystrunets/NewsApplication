@@ -1,5 +1,6 @@
 package com.example.newsapplication.presentation.ui.fragment
 
+import UserAccount
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater

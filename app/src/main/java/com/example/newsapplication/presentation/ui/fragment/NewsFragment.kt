@@ -1,6 +1,7 @@
 package com.example.newsapplication.presentation.ui.fragment
 
 import NewsFragmentViewModel
+import UserAccount
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

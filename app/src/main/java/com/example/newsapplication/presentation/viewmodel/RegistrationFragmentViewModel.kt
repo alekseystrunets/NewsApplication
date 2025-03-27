@@ -1,9 +1,11 @@
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapplication.data.db.dao.UserDao
 import com.example.newsapplication.data.db.entity.User
+import com.example.newsapplication.data.db.sharedpref.SharedPreferencesManager
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
@@ -27,19 +29,23 @@ class RegistrationFragmentViewModel : ViewModel() {
     private val EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
     private val PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$")
 
-    fun registerUser(login: String, email: String, password: String) {
+    fun registerUser(login: String, email: String, password: String, context: Context) {
         if (!validateInput(login, email, password)) return
 
         viewModelScope.launch {
             try {
                 if (userDao.getUserByEmail(email) != null) {
-                    _emailError.postValue("Email already registered")
+                    _emailError.postValue("Email already exists")
                 } else {
-                    userDao.insertUser(User(email = email, login = login, password = password))
+                    userDao.insertUser(User(login = login, email = email, password = password))
+
+                    SharedPreferencesManager.saveUserEmail(context, email)
+                    SharedPreferencesManager.saveUserLogin(context, login)
+
                     _registrationSuccess.postValue(true)
                 }
             } catch (e: Exception) {
-                _emailError.postValue("Database error")
+                _emailError.postValue("Registration failed")
             }
         }
     }
