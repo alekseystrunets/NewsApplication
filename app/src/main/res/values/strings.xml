@@ -17,4 +17,8 @@
     <string name="bookmarks">bookmarks</string>
     <string name="profile">profile</string>
 
+    <string name="no_internet">No internet connection</string>
+    <string name="retrying">Check your connection and try again.</string>
+    <string name="try_again">Try again</string>
+
 </resources>

@@ -53,4 +53,8 @@ class NewsAdapter : ListAdapter<NewsItem, NewsAdapter.NewsViewHolder>(DiffCallba
         override fun areContentsTheSame(oldItem: NewsItem, newItem: NewsItem) =
             oldItem == newItem
     }
+
+    override fun getItemCount(): Int {
+        return super.getItemCount()
+    }
 }
