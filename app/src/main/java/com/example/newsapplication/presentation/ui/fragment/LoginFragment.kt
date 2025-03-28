@@ -2,9 +2,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.BounceInterpolator
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -37,60 +34,15 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initAnimations()
         setupClickListeners()
         setupObservers()
-    }
 
-    private fun initAnimations() {
-        binding.apply {
-            firstGreetingForLogin.apply {
-                alpha = 0f
-                translationY = 30f
-                animate()
-                    .alpha(1f)
-                    .translationY(0f)
-                    .setDuration(600)
-                    .setInterpolator(DecelerateInterpolator())
-                    .start()
-            }
-
-            divider.apply {
-                alpha = 0f
-                scaleX = 0f
-                animate()
-                    .alpha(1f)
-                    .scaleX(1f)
-                    .setDuration(400)
-                    .setInterpolator(OvershootInterpolator())
-                    .setStartDelay(300)
-                    .start()
-            }
-
-            secondGreetingForLogin.apply {
-                alpha = 0f
-                translationY = 20f
-                animate()
-                    .alpha(1f)
-                    .translationY(0f)
-                    .setDuration(500)
-                    .setInterpolator(BounceInterpolator())
-                    .setStartDelay(600)
-                    .start()
-            }
-
-            formCard.apply {
-                alpha = 0f
-                translationY = 40f
-                animate()
-                    .alpha(1f)
-                    .translationY(0f)
-                    .setDuration(600)
-                    .setStartDelay(900)
-                    .start()
-            }
+        binding.registerButton.setOnClickListener{
+            navigateToRegistration()
         }
     }
+
+
 
     private fun setupClickListeners() {
         binding.loginButton.setOnClickListener {
@@ -102,10 +54,6 @@ class LoginFragment : Fragment() {
 
             viewModel.validateInput(login, password)
         }
-
-        binding.registerButton.setOnClickListener {
-            navigateToRegistration()
-        }
     }
 
     private fun setupObservers() {
@@ -114,23 +62,35 @@ class LoginFragment : Fragment() {
                 val login = binding.loginEditText.text.toString().trim()
 
                 viewModel.viewModelScope.launch {
-                    val user = viewModel.userDao.getUserByLogin(login)
+                    val user = withContext(Dispatchers.IO) {
+                        viewModel.userDao.getUserByLogin(login)
+                    }
                     user?.let {
                         SharedPreferencesManager.saveUserEmail(requireContext(), it.email)
                         SharedPreferencesManager.saveUserLogin(requireContext(), it.login)
-                    }
-                    withContext(Dispatchers.Main) {
                         navigateToNews()
                     }
                 }
             }
         }
+
+        viewModel.loginError.observe(viewLifecycleOwner) { error ->
+            binding.loginInputLayout.error = error
+        }
+
+        viewModel.passwordError.observe(viewLifecycleOwner) { error ->
+            binding.passwordInputLayout.error = error
+        }
+
+        viewModel.toastMessage.observe(viewLifecycleOwner) { message ->
+            message?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun navigateToNews() {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, NewsFragment())
-            .addToBackStack(null)
+        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, NewsFragment())
             .commit()
     }
 

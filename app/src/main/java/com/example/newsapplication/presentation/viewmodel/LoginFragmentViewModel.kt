@@ -20,6 +20,9 @@ class LoginFragmentViewModel : ViewModel() {
     private val _isValid = MutableLiveData<Boolean>()
     val isValid: LiveData<Boolean> get() = _isValid
 
+    private val _toastMessage = MutableLiveData<String?>()
+    val toastMessage: LiveData<String?> get() = _toastMessage
+
     private val LOGIN_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]{3,20}$")
     private val PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$")
 
@@ -29,6 +32,7 @@ class LoginFragmentViewModel : ViewModel() {
         _loginError.value = null
         _passwordError.value = null
         _authError.value = null
+        _toastMessage.value = null
 
         var hasErrors = false
 
@@ -76,14 +80,15 @@ class LoginFragmentViewModel : ViewModel() {
                     _isValid.postValue(true)
                 } else {
                     val userExists = userDao.getUserByLogin(login) != null
-                    _authError.postValue(
-                        if (userExists) "Incorrect password"
-                        else "User not found"
-                    )
+                    val errorMessage = if (userExists) "Incorrect password" else "User not found"
+                    _authError.postValue(errorMessage)
+                    _toastMessage.postValue(errorMessage)
                     _isValid.postValue(false)
                 }
             } catch (e: Exception) {
-                _authError.postValue("Authentication failed")
+                val errorMessage = "Authentication failed: ${e.message}"
+                _authError.postValue(errorMessage)
+                _toastMessage.postValue(errorMessage)
                 _isValid.postValue(false)
             }
         }
