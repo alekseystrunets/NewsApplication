@@ -56,8 +56,9 @@ class NewsFragmentViewModel : ViewModel() {
                 throw Exception("No articles found for $category")
             }
 
-            response.articles.map { article ->
+            response.articles.mapIndexed { index, article ->
                 NewsItem(
+                    id = index + 1,
                     title = article.title,
                     author = article.author ?: "Unknown",
                     date = formatDate(article.publishedAt),
@@ -86,6 +87,7 @@ class NewsFragmentViewModel : ViewModel() {
                     else -> "API error: ${e.code()}"
                 }
             }
+
             else -> e.message ?: "Unknown error"
         }
 
