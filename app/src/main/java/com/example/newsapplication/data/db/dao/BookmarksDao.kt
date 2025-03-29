@@ -26,4 +26,13 @@ interface BookmarksDao {
 
     @Query("DELETE FROM user_bookmarks WHERE userEmail = :userEmail AND newsId = :newsId")
     suspend fun removeUserBookmark(userEmail: String, newsId: Int)
+
+    @Query(
+        """
+    SELECT bookmarks.* FROM bookmarks 
+    INNER JOIN user_bookmarks ON bookmarks.id = user_bookmarks.newsId 
+    WHERE user_bookmarks.userEmail = :userEmail
+"""
+    )
+    suspend fun getUserBookmarks(userEmail: String): List<Bookmark>
 }

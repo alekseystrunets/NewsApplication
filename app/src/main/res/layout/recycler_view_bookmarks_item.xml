@@ -8,7 +8,8 @@
     android:elevation="4dp"
     android:outlineProvider="bounds"
     android:layout_marginHorizontal="10dp"
-    android:layout_marginTop="5dp">
+    android:layout_marginTop="5dp"
+    android:id="@+id/bookmark_item">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title"

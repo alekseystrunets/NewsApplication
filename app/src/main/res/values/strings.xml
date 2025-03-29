@@ -22,4 +22,7 @@
     <string name="retrying">Check your connection and try again.</string>
     <string name="try_again">Try again</string>
 
+    <string name="no_bookmarks">Nothing in Bookmarks</string>
+    <string name="no_bookmarks_yet">Nothing in Bookmarks yet</string>
+
 </resources>
