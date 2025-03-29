@@ -38,8 +38,15 @@ class BooksMarkFragment : Fragment() {
         setupObservers()
         viewModel.loadBookmarks()
 
-        binding.btnProfile.setOnClickListener { toAccountScreen() }
-        binding.btnHome.setOnClickListener { toNewsScreen() }
+        binding.btnProfile.setOnClickListener {
+            toAccountScreen()
+        }
+        binding.btnHome.setOnClickListener {
+            toNewsScreen()
+        }
+        binding.arrowBack.setOnClickListener {
+            back()
+        }
     }
 
     private fun setupAdapter() {
@@ -108,6 +115,10 @@ class BooksMarkFragment : Fragment() {
             .replace(R.id.fragment_container, UserAccount())
             .addToBackStack(null)
             .commit()
+    }
+
+    private fun back() {
+        parentFragmentManager.popBackStack()
     }
 
     override fun onDestroyView() {

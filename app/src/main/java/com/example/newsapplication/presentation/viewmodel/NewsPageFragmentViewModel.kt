@@ -19,6 +19,15 @@ class NewsPageFragmentViewModel(application: Application) : AndroidViewModel(app
         }
     }
 
+    fun removeFromBookmarks(newsId: Int, userEmail: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            bookmarksDao.removeUserBookmark(userEmail, newsId)
+            if (!bookmarksDao.isBookmarkUsed(newsId)) {
+                bookmarksDao.deleteBookmark(newsId)
+            }
+        }
+    }
+
     fun isNewsBookmarked(userEmail: String, newsId: Int, callback: (Boolean) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             val isBooked = bookmarksDao.isNewsBookmarked(userEmail, newsId)

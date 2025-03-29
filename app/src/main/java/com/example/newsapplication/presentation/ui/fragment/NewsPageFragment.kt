@@ -23,6 +23,7 @@ class NewsPageFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: NewsPageFragmentViewModel
     private var currentNewsItem: NewsItem? = null
+    private var isBookmarked = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,7 +32,6 @@ class NewsPageFragment : Fragment() {
     ): View {
         _binding = FragmentNewsPageBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(NewsPageFragmentViewModel::class.java)
-
         return binding.root
     }
 
@@ -50,11 +50,17 @@ class NewsPageFragment : Fragment() {
 
     private fun checkBookmarkStatus(newsId: Int) {
         val userEmail = SharedPreferencesManager.getUserEmail(requireContext()) ?: return
-        viewModel.isNewsBookmarked(userEmail, newsId) { isBookmarked ->
-            if (isBookmarked) {
-                binding.btnShare.setImageResource(R.drawable.baseline_bookmark_added_24)
-            }
+        viewModel.isNewsBookmarked(userEmail, newsId) { bookmarked ->
+            isBookmarked = bookmarked
+            updateBookmarkIcon()
         }
+    }
+
+    private fun updateBookmarkIcon() {
+        binding.btnShare.setImageResource(
+            if (isBookmarked) R.drawable.baseline_bookmark_added_24
+            else R.drawable.baseline_bookmark_add_24
+        )
     }
 
     private fun loadNewsData(news: NewsItem) {
@@ -78,32 +84,38 @@ class NewsPageFragment : Fragment() {
         }
 
         binding.btnShare.setOnClickListener {
-            saveToBookmarks(news)
+            toggleBookmarkStatus(news)
         }
     }
 
-    private fun saveToBookmarks(news: NewsItem) {
+    private fun toggleBookmarkStatus(news: NewsItem) {
         val userEmail = SharedPreferencesManager.getUserEmail(requireContext())
         if (userEmail == null || userEmail == "No email") {
             Snackbar.make(binding.root, "Войдите в аккаунт для сохранения", Snackbar.LENGTH_SHORT).show()
             return
         }
 
-        val bookmark = Bookmark(
-            id = news.id,
-            title = news.title,
-            author = news.author,
-            date = news.date,
-            imageUrl = news.imageUrl,
-            content = news.content,
-            description = news.description,
-            source = news.source,
-            articleUrl = news.articleUrl
-        )
-
-        viewModel.saveToBookmarks(bookmark, userEmail)
-        Snackbar.make(binding.root, "Сохранено в закладки", Snackbar.LENGTH_SHORT).show()
-        binding.btnShare.setImageResource(R.drawable.baseline_bookmark_added_24)
+        if (isBookmarked) {
+            viewModel.removeFromBookmarks(news.id, userEmail)
+            isBookmarked = false
+            Snackbar.make(binding.root, "Удалено из закладок", Snackbar.LENGTH_SHORT).show()
+        } else {
+            val bookmark = Bookmark(
+                id = news.id,
+                title = news.title,
+                author = news.author,
+                date = news.date,
+                imageUrl = news.imageUrl,
+                content = news.content,
+                description = news.description,
+                source = news.source,
+                articleUrl = news.articleUrl
+            )
+            viewModel.saveToBookmarks(bookmark, userEmail)
+            isBookmarked = true
+            Snackbar.make(binding.root, "Сохранено в закладки", Snackbar.LENGTH_SHORT).show()
+        }
+        updateBookmarkIcon()
     }
 
     private fun setupBottomMenu() {

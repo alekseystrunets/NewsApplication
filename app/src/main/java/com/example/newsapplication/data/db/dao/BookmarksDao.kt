@@ -35,4 +35,7 @@ interface BookmarksDao {
 """
     )
     suspend fun getUserBookmarks(userEmail: String): List<Bookmark>
+
+    @Query("SELECT COUNT(*) FROM user_bookmarks WHERE newsId = :newsId")
+    suspend fun isBookmarkUsed(newsId: Int): Boolean
 }
